@@ -6,75 +6,116 @@
 <title>Forest</title>
 
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #000;
+    color: #fff;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Courier New", Courier, monospace;
+}
+
+.contenedor {
+    text-align: center;
+}
+
+h1 {
+    font-size: 64px;
+    font-weight: normal;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+
+    animation: fallo 5s infinite;
+}
+
+@keyframes fallo {
+    0%, 8%, 10%, 12%, 50%, 52%, 54%, 100% {
+        opacity: 1;
+        text-shadow: 0 0 3px #fff;
     }
 
-    body {
-        background: #000;
-        color: #fff;
-        width: 100%;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: "Courier New", Courier, monospace;
+    9%, 11% {
+        opacity: 0.15;
+        text-shadow: none;
     }
 
-    .contenedor {
-        text-align: center;
+    51% {
+        opacity: 0.4;
+        text-shadow: none;
     }
 
+    53% {
+        opacity: 0.05;
+        text-shadow: none;
+    }
+
+    55% {
+        opacity: 0.8;
+        text-shadow: 0 0 5px #fff;
+    }
+
+    70% {
+        opacity: 0.9;
+    }
+
+    71% {
+        opacity: 0.2;
+    }
+
+    73% {
+        opacity: 1;
+    }
+}
+
+.enlaces {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    letter-spacing: 1px;
+    transition: opacity 0.3s;
+}
+
+a:hover {
+    opacity: 0.5;
+}
+
+@media (max-width: 600px) {
     h1 {
-        font-size: 64px;
-        font-weight: normal;
-        letter-spacing: 2px;
-        margin-bottom: 30px;
+        font-size: 48px;
     }
-
-    .enlaces {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    a {
-        color: #fff;
-        text-decoration: none;
-        font-size: 16px;
-        letter-spacing: 1px;
-        transition: opacity 0.3s;
-    }
-
-    a:hover {
-        opacity: 0.5;
-    }
-
-    @media (max-width: 600px) {
-        h1 {
-            font-size: 48px;
-        }
-    }
+}
 </style>
 </head>
 
 <body>
 
-    <div class="contenedor">
+<div class="contenedor">
 
-        <h1>Forest</h1>
+    <h1>Forest</h1>
 
-        <div class="enlaces">
-            <a href="https://forestaudiovisual.bandcamp.com/"
-               target="_blank">bandcamp</a>
+    <div class="enlaces">
+        <a href="https://forestaudiovisual.bandcamp.com/"
+           target="_blank">bandcamp</a>
 
-            <a href="https://www.youtube.com/@forest_audiovisual"
-               target="_blank">youtube</a>
-        </div>
-
+        <a href="https://www.youtube.com/@forest_audiovisual"
+           target="_blank">youtube</a>
     </div>
+
+</div>
 
 </body>
 </html>
