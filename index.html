@@ -5,14 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Forest</title>
 
-<!-- Redirección automática a Bandcamp -->
-<meta http-equiv="refresh" content="0; url=https://forestaudiovisual.bandcamp.com/">
-<link rel="canonical" href="https://forestaudiovisual.bandcamp.com/">
-
-<script>
-    window.location.replace("https://forestaudiovisual.bandcamp.com/");
-</script>
-
 <style>
     * {
         margin: 0;
@@ -21,41 +13,68 @@
     }
 
     body {
-        background-color: #000;
+        background: #000;
         color: #fff;
         width: 100%;
-        height: 100vh;
+        min-height: 100vh;
         display: flex;
-        flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 16px;
+        font-family: "Courier New", Courier, monospace;
+    }
+
+    .contenedor {
+        text-align: center;
     }
 
     h1 {
-        font-family: "Courier New", Courier, monospace;
         font-size: 64px;
         font-weight: normal;
         letter-spacing: 2px;
+        margin-bottom: 30px;
+    }
+
+    .enlaces {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
     }
 
     a {
-        font-family: "Courier New", Courier, monospace;
-        color: #888;
-        font-size: 14px;
+        color: #fff;
         text-decoration: none;
+        font-size: 16px;
+        letter-spacing: 1px;
+        transition: opacity 0.3s;
     }
 
     a:hover {
-        color: #fff;
+        opacity: 0.5;
+    }
+
+    @media (max-width: 600px) {
+        h1 {
+            font-size: 48px;
+        }
     }
 </style>
 </head>
 
 <body>
 
-    <h1>Forest</h1>
-    <a href="https://forestaudiovisual.bandcamp.com/">forestaudiovisual.bandcamp.com</a>
+    <div class="contenedor">
+
+        <h1>Forest</h1>
+
+        <div class="enlaces">
+            <a href="https://forestaudiovisual.bandcamp.com/"
+               target="_blank">bandcamp</a>
+
+            <a href="https://www.youtube.com/@forest_audiovisual"
+               target="_blank">youtube</a>
+        </div>
+
+    </div>
 
 </body>
 </html>
