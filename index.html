@@ -2,245 +2,99 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Forest</title>
-
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+*{margin:0;padding:0;box-sizing:border-box}
+html{min-height:100%;background:#000;color-scheme:dark}
+body{position:relative;background:#000;color:#fff;min-height:100vh;min-height:100svh;display:flex;justify-content:center;align-items:center;overflow-x:hidden;font-family:"Courier New",Courier,monospace;-webkit-tap-highlight-color:transparent}
 
-body {
-    background: #000;
-    color: #fff;
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    font-family: "Courier New", Courier, monospace;
-}
+/* FONDO GLITCH MONOCROMÁTICO */
+.glitch-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:repeating-linear-gradient(0deg,transparent 0px,transparent 3px,rgba(255,255,255,.035) 4px)}
+.glitch-bg::before{content:"";position:absolute;inset:-50%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");opacity:.10;animation:ruido .2s steps(2) infinite}
+.glitch-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(255,255,255,.12) 45.2%,transparent 45.8%),linear-gradient(90deg,transparent 20%,rgba(255,255,255,.08) 20.2%,transparent 20.5%);animation:interferencia 7s infinite steps(1)}
+@keyframes ruido{0%{transform:translate(0,0)}25%{transform:translate(2%,-1%)}50%{transform:translate(-1%,2%)}75%{transform:translate(1%,1%)}100%{transform:translate(-2%,-1%)}}
+@keyframes interferencia{0%,85%,100%{opacity:0;transform:translateX(0)}86%{opacity:1;transform:translateX(15px)}87%{opacity:0}91%{opacity:.8;transform:translateX(-20px)}92%{opacity:0}}
+.bloques{position:fixed;inset:0;pointer-events:none;z-index:1}
+.bloques span{position:absolute;background:#fff;opacity:0;animation:bloquesGlitch 8s infinite steps(1)}
+.bloques span:nth-child(1){top:22%;left:10%;width:120px;height:2px}
+.bloques span:nth-child(2){top:67%;right:15%;width:80px;height:5px;animation-delay:2s}
+.bloques span:nth-child(3){top:40%;right:8%;width:3px;height:60px;animation-delay:4s}
+.bloques span:nth-child(4){bottom:20%;left:25%;width:160px;height:3px;animation-delay:5s}
+@keyframes bloquesGlitch{0%,89%,100%{opacity:0}90%{opacity:.8;transform:translateX(12px)}91%{opacity:0}93%{opacity:.5;transform:translateX(-8px)}94%{opacity:0}}
 
-/* FONDO GLITCH */
+/* CONTENIDO PRINCIPAL */
+.contenedor{position:relative;z-index:5;width:min(680px,86vw);padding:48px 0 38px;text-align:center;display:flex;flex-direction:column;align-items:center}
+h1{font-size:64px;font-weight:normal;letter-spacing:2px;margin-bottom:26px;animation:fallo 5s infinite}
+@keyframes fallo{0%,8%,10%,12%,50%,52%,54%,100%{opacity:1;text-shadow:0 0 3px #fff}9%,11%{opacity:.15;text-shadow:none}51%{opacity:.4;text-shadow:none}53%{opacity:.05;text-shadow:none}55%{opacity:.8;text-shadow:0 0 5px #fff}70%{opacity:.9}71%{opacity:.2}73%{opacity:1}}
+.enlaces{display:flex;flex-direction:column;gap:10px;margin-bottom:34px}
+.enlaces a{color:#fff;text-decoration:none;font-size:15px;letter-spacing:1px;transition:opacity .3s}
+.enlaces a:hover{opacity:.5}
 
-.glitch-bg {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-    background:
-        repeating-linear-gradient(
-            0deg,
-            transparent 0px,
-            transparent 3px,
-            rgba(255,255,255,0.035) 4px
-        );
-}
-
-.glitch-bg::before {
-    content: "";
-    position: absolute;
-    inset: -50%;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
-    opacity: 0.10;
-    animation: ruido 0.2s steps(2) infinite;
-}
-
-.glitch-bg::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(
-            transparent 45%,
-            rgba(255,255,255,0.12) 45.2%,
-            transparent 45.8%
-        ),
-        linear-gradient(
-            90deg,
-            transparent 20%,
-            rgba(255,255,255,0.08) 20.2%,
-            transparent 20.5%
-        );
-    animation: interferencia 7s infinite steps(1);
-}
-
-@keyframes ruido {
-    0% { transform: translate(0,0); }
-    25% { transform: translate(2%, -1%); }
-    50% { transform: translate(-1%, 2%); }
-    75% { transform: translate(1%, 1%); }
-    100% { transform: translate(-2%, -1%); }
-}
-
-@keyframes interferencia {
-    0%, 85%, 100% {
-        opacity: 0;
-        transform: translateX(0);
-    }
-    86% {
-        opacity: 1;
-        transform: translateX(15px);
-    }
-    87% {
-        opacity: 0;
-    }
-    91% {
-        opacity: .8;
-        transform: translateX(-20px);
-    }
-    92% {
-        opacity: 0;
-    }
-}
-
-/* BLOQUES DE GLITCH */
-
-.bloques {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.bloques span {
-    position: absolute;
-    background: white;
-    opacity: 0;
-    animation: bloquesGlitch 8s infinite steps(1);
-}
-
-.bloques span:nth-child(1) {
-    top: 22%;
-    left: 10%;
-    width: 120px;
-    height: 2px;
-}
-
-.bloques span:nth-child(2) {
-    top: 67%;
-    right: 15%;
-    width: 80px;
-    height: 5px;
-    animation-delay: 2s;
-}
-
-.bloques span:nth-child(3) {
-    top: 40%;
-    right: 8%;
-    width: 3px;
-    height: 60px;
-    animation-delay: 4s;
-}
-
-.bloques span:nth-child(4) {
-    bottom: 20%;
-    left: 25%;
-    width: 160px;
-    height: 3px;
-    animation-delay: 5s;
-}
-
-@keyframes bloquesGlitch {
-    0%, 89%, 100% { opacity: 0; }
-    90% { opacity: .8; transform: translateX(12px); }
-    91% { opacity: 0; }
-    93% { opacity: .5; transform: translateX(-8px); }
-    94% { opacity: 0; }
-}
-
-/* CONTENIDO */
-
-.contenedor {
-    position: relative;
-    z-index: 5;
-    text-align: center;
-}
-
-h1 {
-    font-size: 64px;
-    font-weight: normal;
-    letter-spacing: 2px;
-    margin-bottom: 30px;
-    animation: fallo 5s infinite;
-}
-
-@keyframes fallo {
-    0%, 8%, 10%, 12%, 50%, 52%, 54%, 100% {
-        opacity: 1;
-        text-shadow: 0 0 3px #fff;
-    }
-    9%, 11% {
-        opacity: .15;
-        text-shadow: none;
-    }
-    51% {
-        opacity: .4;
-        text-shadow: none;
-    }
-    53% {
-        opacity: .05;
-        text-shadow: none;
-    }
-    55% {
-        opacity: .8;
-        text-shadow: 0 0 5px #fff;
-    }
-    70% { opacity: .9; }
-    71% { opacity: .2; }
-    73% { opacity: 1; }
-}
-
-.enlaces {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-a {
-    color: #fff;
-    text-decoration: none;
-    font-size: 16px;
-    letter-spacing: 1px;
-    transition: opacity .3s;
-}
-
-a:hover {
-    opacity: .5;
-}
-
-@media (max-width: 600px) {
-    h1 { font-size: 48px; }
-}
+/* DISPOSITIVO: ESCALA DE DO */
+.device{width:100%;max-width:560px;padding:0 4px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:300}
+#bar{position:relative;width:100%;height:76px;touch-action:none;cursor:ew-resize;outline:none}
+#bar:focus-visible{outline:1px solid rgba(255,255,255,.28);outline-offset:6px}
+.line{position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(255,255,255,.28)}
+#fill{position:absolute;left:0;top:50%;height:1px;width:0;background:#fff;transition:width .08s}
+.tick{position:absolute;top:50%;width:1px;height:16px;margin-top:-8px;background:rgba(255,255,255,.28)}
+#thumb{position:absolute;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:#fff;left:6.25%;transition:left .08s,transform .15s}
+#bar.on #thumb{transform:scale(1.35)}
+#hint{margin-top:8px;text-align:center;color:rgba(255,255,255,.38);letter-spacing:.12em;text-transform:uppercase;font-size:10px;transition:opacity .6s;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+#hint.hide{opacity:0}
+@media(max-width:600px){h1{font-size:48px}.contenedor{padding:36px 0 28px}.enlaces{margin-bottom:24px}#bar{height:68px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
-
 <body>
+<div class="glitch-bg" aria-hidden="true"></div>
+<div class="bloques" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
 
-<div class="glitch-bg"></div>
+<main class="contenedor">
+  <h1>Forest</h1>
+  <nav class="enlaces" aria-label="Enlaces de Forest">
+    <a href="https://forestaudiovisual.bandcamp.com/" target="_blank" rel="noopener noreferrer">bandcamp</a>
+    <a href="https://www.youtube.com/@forest_audiovisual" target="_blank" rel="noopener noreferrer">youtube</a>
+  </nav>
 
-<div class="bloques">
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-</div>
-
-<div class="contenedor">
-    <h1>Forest</h1>
-
-    <div class="enlaces">
-        <a href="https://forestaudiovisual.bandcamp.com/"
-           target="_blank">bandcamp</a>
-
-        <a href="https://www.youtube.com/@forest_audiovisual"
-           target="_blank">youtube</a>
+  <section class="device" aria-label="Dispositivo sonoro: escala de Do mayor">
+    <div id="bar" role="slider" tabindex="0" aria-label="Escala de Do mayor" aria-valuemin="1" aria-valuemax="8" aria-valuenow="1" aria-valuetext="Do">
+      <div class="line"></div><div id="fill"></div><div id="thumb"></div>
     </div>
-</div>
+    <div id="hint">Deslizá el dedo</div>
+  </section>
+</main>
 
+<script>
+const NOTES=[['Do',261.63],['Re',293.66],['Mi',329.63],['Fa',349.23],['Sol',392],['La',440],['Si',493.88],['Do',523.25]];
+const $=id=>document.getElementById(id),bar=$('bar'),thumb=$('thumb'),fill=$('fill'),hint=$('hint');
+NOTES.forEach((n,i)=>{const t=document.createElement('div');t.className='tick';t.style.left=((i+.5)/8*100)+'%';bar.appendChild(t)});
+let ctx,osc,filt,amp,idx=-1,active=false;
+function init(){
+  if(ctx){if(ctx.state!=='running')ctx.resume();return}
+  ctx=new (window.AudioContext||window.webkitAudioContext)();
+  osc=ctx.createOscillator();osc.type='triangle';
+  filt=ctx.createBiquadFilter();filt.type='lowpass';filt.frequency.value=2600;
+  amp=ctx.createGain();amp.gain.value=0;
+  osc.connect(filt);filt.connect(amp);amp.connect(ctx.destination);osc.start();
+}
+function show(i){
+  thumb.style.left=((i+.5)/8*100)+'%';fill.style.width=((i+.5)/8*100)+'%';
+  bar.setAttribute('aria-valuenow',i+1);bar.setAttribute('aria-valuetext',NOTES[i][0]);
+}
+function setNote(i){if(i===idx)return;idx=i;show(i);if(ctx)osc.frequency.setTargetAtTime(NOTES[i][1],ctx.currentTime,.012)}
+function start(){active=true;bar.classList.add('on');hint.classList.add('hide');amp.gain.setTargetAtTime(.28,ctx.currentTime,.012)}
+function stop(){active=false;bar.classList.remove('on');if(ctx)amp.gain.setTargetAtTime(0,ctx.currentTime,.08)}
+function fromX(x){const r=bar.getBoundingClientRect();return Math.max(0,Math.min(7,Math.floor((x-r.left)/r.width*8)))}
+bar.addEventListener('pointerdown',e=>{e.preventDefault();init();bar.setPointerCapture(e.pointerId);const i=fromX(e.clientX);idx=-1;osc.frequency.setValueAtTime(NOTES[i][1],ctx.currentTime);setNote(i);start()});
+bar.addEventListener('pointermove',e=>{if(active)setNote(fromX(e.clientX))});
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>bar.addEventListener(t,stop));
+bar.addEventListener('keydown',e=>{
+  if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;e.preventDefault();init();
+  const i=Math.max(0,Math.min(7,(idx<0?0:idx)+(e.key==='ArrowRight'?1:-1)));
+  setNote(i);start();clearTimeout(bar._t);bar._t=setTimeout(stop,350);
+});
+show(0);
+</script>
 </body>
 </html>
