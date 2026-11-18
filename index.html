@@ -20,10 +20,144 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
     font-family: "Courier New", Courier, monospace;
 }
 
+/* FONDO GLITCH */
+
+.glitch-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            transparent 3px,
+            rgba(255,255,255,0.035) 4px
+        );
+}
+
+.glitch-bg::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+    opacity: 0.10;
+    animation: ruido 0.2s steps(2) infinite;
+}
+
+.glitch-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(
+            transparent 45%,
+            rgba(255,255,255,0.12) 45.2%,
+            transparent 45.8%
+        ),
+        linear-gradient(
+            90deg,
+            transparent 20%,
+            rgba(255,255,255,0.08) 20.2%,
+            transparent 20.5%
+        );
+    animation: interferencia 7s infinite steps(1);
+}
+
+@keyframes ruido {
+    0% { transform: translate(0,0); }
+    25% { transform: translate(2%, -1%); }
+    50% { transform: translate(-1%, 2%); }
+    75% { transform: translate(1%, 1%); }
+    100% { transform: translate(-2%, -1%); }
+}
+
+@keyframes interferencia {
+    0%, 85%, 100% {
+        opacity: 0;
+        transform: translateX(0);
+    }
+    86% {
+        opacity: 1;
+        transform: translateX(15px);
+    }
+    87% {
+        opacity: 0;
+    }
+    91% {
+        opacity: .8;
+        transform: translateX(-20px);
+    }
+    92% {
+        opacity: 0;
+    }
+}
+
+/* BLOQUES DE GLITCH */
+
+.bloques {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.bloques span {
+    position: absolute;
+    background: white;
+    opacity: 0;
+    animation: bloquesGlitch 8s infinite steps(1);
+}
+
+.bloques span:nth-child(1) {
+    top: 22%;
+    left: 10%;
+    width: 120px;
+    height: 2px;
+}
+
+.bloques span:nth-child(2) {
+    top: 67%;
+    right: 15%;
+    width: 80px;
+    height: 5px;
+    animation-delay: 2s;
+}
+
+.bloques span:nth-child(3) {
+    top: 40%;
+    right: 8%;
+    width: 3px;
+    height: 60px;
+    animation-delay: 4s;
+}
+
+.bloques span:nth-child(4) {
+    bottom: 20%;
+    left: 25%;
+    width: 160px;
+    height: 3px;
+    animation-delay: 5s;
+}
+
+@keyframes bloquesGlitch {
+    0%, 89%, 100% { opacity: 0; }
+    90% { opacity: .8; transform: translateX(12px); }
+    91% { opacity: 0; }
+    93% { opacity: .5; transform: translateX(-8px); }
+    94% { opacity: 0; }
+}
+
+/* CONTENIDO */
+
 .contenedor {
+    position: relative;
+    z-index: 5;
     text-align: center;
 }
 
@@ -32,7 +166,6 @@ h1 {
     font-weight: normal;
     letter-spacing: 2px;
     margin-bottom: 30px;
-
     animation: fallo 5s infinite;
 }
 
@@ -41,38 +174,25 @@ h1 {
         opacity: 1;
         text-shadow: 0 0 3px #fff;
     }
-
     9%, 11% {
-        opacity: 0.15;
+        opacity: .15;
         text-shadow: none;
     }
-
     51% {
-        opacity: 0.4;
+        opacity: .4;
         text-shadow: none;
     }
-
     53% {
-        opacity: 0.05;
+        opacity: .05;
         text-shadow: none;
     }
-
     55% {
-        opacity: 0.8;
+        opacity: .8;
         text-shadow: 0 0 5px #fff;
     }
-
-    70% {
-        opacity: 0.9;
-    }
-
-    71% {
-        opacity: 0.2;
-    }
-
-    73% {
-        opacity: 1;
-    }
+    70% { opacity: .9; }
+    71% { opacity: .2; }
+    73% { opacity: 1; }
 }
 
 .enlaces {
@@ -86,25 +206,31 @@ a {
     text-decoration: none;
     font-size: 16px;
     letter-spacing: 1px;
-    transition: opacity 0.3s;
+    transition: opacity .3s;
 }
 
 a:hover {
-    opacity: 0.5;
+    opacity: .5;
 }
 
 @media (max-width: 600px) {
-    h1 {
-        font-size: 48px;
-    }
+    h1 { font-size: 48px; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="contenedor">
+<div class="glitch-bg"></div>
 
+<div class="bloques">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+
+<div class="contenedor">
     <h1>Forest</h1>
 
     <div class="enlaces">
@@ -114,7 +240,6 @@ a:hover {
         <a href="https://www.youtube.com/@forest_audiovisual"
            target="_blank">youtube</a>
     </div>
-
 </div>
 
 </body>
