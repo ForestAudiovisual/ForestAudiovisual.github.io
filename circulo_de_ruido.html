@@ -36,10 +36,9 @@ main{position:relative;z-index:5;height:100%;display:flex;align-items:center;jus
 #pad.on #dot{transform:scale(1.4)}
 #hint{position:fixed;z-index:6;left:0;right:0;bottom:calc(28px + env(safe-area-inset-bottom,0px));text-align:center;color:rgba(255,255,255,.5);letter-spacing:1px;font-size:12px;transition:opacity .6s;font-family:"Courier New",Courier,monospace}
 #hint.hide{opacity:0}
-.inicio{position:fixed;z-index:6;right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);transition:opacity .3s}
+.inicio{position:fixed;z-index:6;right:env(safe-area-inset-right,0px);bottom:env(safe-area-inset-bottom,0px);padding:20px 22px;color:rgba(255,255,255,.6);text-decoration:none;font-family:"Courier New",Courier,monospace;font-size:14px;letter-spacing:1px;transition:opacity .3s}
 .inicio:hover{opacity:.5}
 .inicio:focus-visible{outline:1px solid var(--dim);outline-offset:2px}
-.inicio svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -51,7 +50,7 @@ main{position:relative;z-index:5;height:100%;display:flex;align-items:center;jus
 <g id="st"></g><path id="cell" d=""/><g id="dotg"><circle id="dot" r="4.5" cx="0" cy="0"/></g>
 </svg>
 </main>
-<a class="inicio" href="https://forestaudiovisual.github.io/" aria-label="Volver al inicio" title="Volver al inicio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-6h4v6"/></svg></a>
+<a class="inicio" href="https://forestaudiovisual.github.io/" aria-label="Volver al inicio" title="Volver al inicio">volver</a>
 <div id="hint">deslizá el dedo</div>
 <script>
 const NOTES=[['Do',261.63],['Re',293.66],['Mi',329.63],['Fa',349.23],['Sol',392],['La',440],['Si',493.88],['Do',523.25]];
