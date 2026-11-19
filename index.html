@@ -27,7 +27,7 @@ body{position:relative;background:#000;color:#fff;min-height:100vh;min-height:10
 .contenedor{position:relative;z-index:5;width:min(680px,86vw);padding:48px 0 38px;text-align:center;display:flex;flex-direction:column;align-items:center}
 h1{font-size:64px;font-weight:normal;letter-spacing:2px;margin-bottom:26px;animation:fallo 5s infinite}
 @keyframes fallo{0%,8%,10%,12%,50%,52%,54%,100%{opacity:1;text-shadow:0 0 3px #fff}9%,11%{opacity:.15;text-shadow:none}51%{opacity:.4;text-shadow:none}53%{opacity:.05;text-shadow:none}55%{opacity:.8;text-shadow:0 0 5px #fff}70%{opacity:.9}71%{opacity:.2}73%{opacity:1}}
-.enlaces{display:flex;flex-direction:column;gap:10px;margin-bottom:34px}
+.enlaces{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px;margin-bottom:34px;font-size:15px;letter-spacing:1px}
 .enlaces a{color:#fff;text-decoration:none;font-size:15px;letter-spacing:1px;transition:opacity .3s}
 .enlaces a:hover{opacity:.5}
 
@@ -40,7 +40,7 @@ h1{font-size:64px;font-weight:normal;letter-spacing:2px;margin-bottom:26px;anima
 .tick{position:absolute;top:50%;width:1px;height:16px;margin-top:-8px;background:rgba(255,255,255,.28)}
 #thumb{position:absolute;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:#fff;left:6.25%;transition:left .08s,transform .15s}
 #bar.on #thumb{transform:scale(1.35)}
-#hint{margin-top:8px;text-align:center;color:rgba(255,255,255,.38);letter-spacing:.12em;text-transform:uppercase;font-size:10px;transition:opacity .6s;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+#hint{margin-top:8px;text-align:center;color:rgba(255,255,255,.5);letter-spacing:1px;font-size:12px;transition:opacity .6s;font-family:"Courier New",Courier,monospace}
 #hint.hide{opacity:0}
 .pie{position:fixed;left:0;right:0;bottom:0;z-index:6;text-align:center;padding:0 12px calc(14px + env(safe-area-inset-bottom,0px));font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.6)}
 .pie a{color:#fff;text-decoration:none;transition:opacity .3s}
@@ -54,17 +54,18 @@ h1{font-size:64px;font-weight:normal;letter-spacing:2px;margin-bottom:26px;anima
 <div class="bloques" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
 
 <main class="contenedor">
-  <h1>Forest</h1>
+  <h1>FOREST</h1>
   <nav class="enlaces" aria-label="Enlaces de Forest">
-    <a href="https://forestaudiovisual.bandcamp.com/" target="_blank" rel="noopener noreferrer">bandcamp</a>
-    <a href="https://www.youtube.com/@forest_audiovisual" target="_blank" rel="noopener noreferrer">youtube</a>
+    <a href="https://forestaudiovisual.bandcamp.com/" target="_blank" rel="noopener noreferrer">Bandcamp</a>
+    <span aria-hidden="true">/</span>
+    <a href="https://www.youtube.com/@forest_audiovisual" target="_blank" rel="noopener noreferrer">Youtube</a>
   </nav>
 
   <section class="device" aria-label="Dispositivo sonoro: escala de Do mayor">
     <div id="bar" role="slider" tabindex="0" aria-label="Escala de Do mayor" aria-valuemin="1" aria-valuemax="8" aria-valuenow="1" aria-valuetext="Do">
       <div class="line"></div><div id="fill"></div><div id="thumb"></div>
     </div>
-    <div id="hint">Deslizá el dedo</div>
+    <div id="hint">deslizá el dedo</div>
   </section>
 </main>
 
