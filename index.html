@@ -42,6 +42,9 @@ h1{font-size:64px;font-weight:normal;letter-spacing:2px;margin-bottom:26px;anima
 #bar.on #thumb{transform:scale(1.35)}
 #hint{margin-top:8px;text-align:center;color:rgba(255,255,255,.38);letter-spacing:.12em;text-transform:uppercase;font-size:10px;transition:opacity .6s;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
 #hint.hide{opacity:0}
+.pie{position:fixed;left:0;right:0;bottom:0;z-index:6;text-align:center;padding:0 12px calc(14px + env(safe-area-inset-bottom,0px));font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.6)}
+.pie a{color:#fff;text-decoration:none;transition:opacity .3s}
+.pie a:hover{opacity:.5}
 @media(max-width:600px){h1{font-size:48px}.contenedor{padding:36px 0 28px}.enlaces{margin-bottom:24px}#bar{height:68px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -64,6 +67,10 @@ h1{font-size:64px;font-weight:normal;letter-spacing:2px;margin-bottom:26px;anima
     <div id="hint">Deslizá el dedo</div>
   </section>
 </main>
+
+<footer class="pie">
+  <a href="https://forestaudiovisual.github.io/circulo_de_ruido.html" target="_blank" rel="noopener noreferrer">Círculo de Ruido</a>
+</footer>
 
 <script>
 
