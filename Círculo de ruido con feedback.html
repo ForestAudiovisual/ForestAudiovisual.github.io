@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Círculo de ruido</title>
+<style>
+:root{--bg:#000;--fg:#fff;--dim:rgba(255,255,255,.28);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box}
+body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:300 15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+main{height:100%;display:flex;align-items:center;justify-content:center;padding:0 5%}
+#pad{width:min(88vw,64vh,560px);height:auto;aspect-ratio:1;touch-action:none;cursor:crosshair;outline:none;display:block}
+#pad:focus-visible{outline:1px solid var(--dim);outline-offset:8px;border-radius:50%}
+.rg{fill:none;stroke:var(--dim);stroke-width:.4}
+.rim{fill:none;stroke:rgba(255,255,255,.55);stroke-width:.5}
+.rd{stroke:rgba(255,255,255,.1);stroke-width:.4}
+#cell{fill:#fff;opacity:0;transition:opacity .15s}
+#pad.on #cell{opacity:.16}
+#dotg{transition:transform .07s}
+#dot{fill:#fff;transition:transform .15s}
+#pad.on #dot{transform:scale(1.4)}
+#hint{position:fixed;left:0;right:0;bottom:calc(28px + env(safe-area-inset-bottom,0px));text-align:center;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;font-size:12px;transition:opacity .6s}
+#hint.hide{opacity:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<svg id="pad" viewBox="0 0 200 200" tabindex="0" role="application" aria-label="Círculo de notas">
+<g id="st"></g><path id="cell" d=""/><g id="dotg"><circle id="dot" r="4.5" cx="0" cy="0"/></g>
+</svg>
+</main>
+<div id="hint">Deslizá el dedo</div>
+<script>
+const NOTES=[['Do',261.63],['Re',293.66],['Mi',329.63],['Fa',349.23],['Sol',392],['La',440],['Si',493.88],['Do',523.25]];
+const $=id=>document.getElementById(id),svg=$('pad'),cell=$('cell'),dotg=$('dotg'),hint=$('hint'),SVGNS='http://www.w3.org/2000/svg';
+const D={mix:35,tm:35};
+let ctx,osc,osc2,ns,gs,bp,ng,og,ws,filt,amp,dly,wet,fb,pk,lim,cur=-1,curN=0,curR=0,active=false;
+function el(n,a){const e=document.createElementNS(SVGNS,n);for(const k in a)e.setAttribute(k,a[k]);return e}
+[23,46,69,92].forEach(r=>$('st').appendChild(el('circle',{cx:100,cy:100,r,class:r===92?'rim':'rg'})));
+for(let k=0;k<8;k++){const a=k*Math.PI/4;$('st').appendChild(el('line',{x1:100,y1:100,x2:100+92*Math.sin(a),y2:100-92*Math.cos(a),class:'rd'}))}
+function init(){
+  if(ctx){if(ctx.state!=='running')ctx.resume();return}
+  ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const sr=ctx.sampleRate;
+  osc=ctx.createOscillator();osc.type='sawtooth';
+  osc2=ctx.createOscillator();osc2.type='square';osc2.detune.value=9;
+  const nb=ctx.createBuffer(1,sr*2,sr),nd=nb.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
+  ns=ctx.createBufferSource();ns.buffer=nb;ns.loop=true;
+  bp=ctx.createBiquadFilter();bp.type='bandpass';bp.Q.value=2;
+  ng=ctx.createGain();ng.gain.value=2.2;og=ctx.createGain();og.gain.value=1;
+  ws=ctx.createWaveShaper();const cv=new Float32Array(1024);for(let i=0;i<1024;i++){const x=i/511.5-1;cv[i]=Math.max(-1,Math.min(1,x*20))}ws.curve=cv;
+  filt=ctx.createBiquadFilter();filt.type='lowpass';filt.frequency.value=1800;
+  const sh=ctx.createBiquadFilter();sh.type='lowshelf';sh.frequency.value=150;sh.gain.value=14;
+  const hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=1200;const hg=ctx.createGain();hg.gain.value=0.7;
+  const gb=ctx.createBuffer(1,sr*3,sr),gdt=gb.getChannelData(0);
+  for(let i=0;i<gdt.length;){const len=20+Math.floor(Math.random()*Math.random()*sr*0.012),on=Math.random()<0.45,a=0.3+Math.random()*0.7;for(let j=0;j<len&&i<gdt.length;j++,i++)gdt[i]=on?(Math.random()*2-1)*a:0}
+  gs=ctx.createBufferSource();gs.buffer=gb;gs.loop=true;
+  amp=ctx.createGain();amp.gain.value=0;
+  osc.connect(og);osc2.connect(og);og.connect(ws);ns.connect(bp);bp.connect(ng);ng.connect(ws);
+  ws.connect(filt);filt.connect(sh);sh.connect(amp);gs.connect(hp);hp.connect(hg);hg.connect(amp);lim=ctx.createDynamicsCompressor();lim.threshold.value=-12;lim.knee.value=0;lim.ratio.value=20;lim.attack.value=0.003;lim.release.value=0.15;lim.connect(ctx.destination);amp.connect(lim);
+  dly=ctx.createDelay(1.5);dly.delayTime.value=0.08+D.tm/100*0.72;
+  fb=ctx.createGain();fb.gain.value=0.45;const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=5000;pk=ctx.createBiquadFilter();pk.type='peaking';pk.Q.value=10;pk.gain.value=0;pk.frequency.value=1000;const sat=ctx.createWaveShaper(),sc=new Float32Array(1024);for(let i=0;i<1024;i++)sc[i]=Math.tanh(i/511.5-1);sat.curve=sc;
+  wet=ctx.createGain();wet.gain.value=D.mix/100*0.8;
+  amp.connect(dly);dly.connect(lp);lp.connect(pk);pk.connect(fb);fb.connect(sat);sat.connect(dly);pk.connect(wet);wet.connect(lim);
+  osc.start();osc2.start();ns.start();gs.start();
+}
+function setF(f,tc){f/=16;const t=ctx.currentTime;osc.frequency.setTargetAtTime(f,t,tc);osc2.frequency.setTargetAtTime(f*1.498,t,tc);bp.frequency.setTargetAtTime(f*8,t,tc);pk.frequency.setTargetAtTime(Math.min(5000,f*16),t,tc)}
+function show(n,ring){
+  const a0=n*Math.PI/4,a1=(n+1)*Math.PI/4,r0=ring*23,r1=(ring+1)*23;
+  const P=(r,a)=>(100+r*Math.sin(a)).toFixed(2)+' '+(100-r*Math.cos(a)).toFixed(2);
+  cell.setAttribute('d','M'+P(r1,a0)+'A'+r1+' '+r1+' 0 0 1 '+P(r1,a1)+'L'+P(r0,a1)+'A'+r0+' '+r0+' 0 0 0 '+P(r0,a0)+'Z');
+  const am=a0+Math.PI/8,rm=(ring+.5)*23;
+  dotg.style.transform='translate('+(100+rm*Math.sin(am))+'px,'+(100-rm*Math.cos(am))+'px)';
+  svg.setAttribute('aria-label','Círculo de notas: '+NOTES[n][0]+', octava '+(ring+1));
+}
+const FB=[0.45,0.5,0.7,1.0],PG=[0,0,2,8];
+function setFb(r){const t=ctx.currentTime;fb.gain.setTargetAtTime(FB[r],t,r===3?0.35:0.15);pk.gain.setTargetAtTime(PG[r],t,0.2)}
+function setNote(n,ring){
+  const id=ring*8+n;if(id===cur)return;cur=id;curN=n;curR=ring;show(n,ring);
+  if(ctx){setF(NOTES[n][1]*Math.pow(2,ring),0.012);setFb(ring)}
+}
+function start(){active=true;svg.classList.add('on');hint.classList.add('hide');amp.gain.setTargetAtTime(0.14,ctx.currentTime,0.012)}
+function stop(){active=false;svg.classList.remove('on');if(ctx){amp.gain.setTargetAtTime(0,ctx.currentTime,0.08);fb.gain.setTargetAtTime(0.45,ctx.currentTime,0.5);pk.gain.setTargetAtTime(0,ctx.currentTime,0.3)}}
+function pos(e){
+  const r=svg.getBoundingClientRect(),k=200/r.width,dx=(e.clientX-r.left)*k-100,dy=(e.clientY-r.top)*k-100;
+  let a=Math.atan2(dx,-dy);if(a<0)a+=2*Math.PI;
+  return [Math.min(7,Math.floor(a/(Math.PI/4))),Math.min(3,Math.floor(Math.hypot(dx,dy)/23))];
+}
+svg.addEventListener('pointerdown',e=>{e.preventDefault();init();svg.setPointerCapture(e.pointerId);const [n,r]=pos(e);cur=-1;setF(NOTES[n][1]*Math.pow(2,r),0.001);setNote(n,r);start()});
+svg.addEventListener('pointermove',e=>{if(active){const [n,r]=pos(e);setNote(n,r)}});
+['pointerup','pointercancel'].forEach(t=>svg.addEventListener(t,stop));
+svg.addEventListener('keydown',e=>{
+  const m={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,1],ArrowDown:[0,-1]}[e.key];if(!m)return;
+  e.preventDefault();init();
+  setNote(Math.max(0,Math.min(7,curN+m[0])),Math.max(0,Math.min(3,curR+m[1])));
+  start();clearTimeout(svg._t);svg._t=setTimeout(stop,350);
+});
+show(0,0);
+</script>
+</body>
+</html>
