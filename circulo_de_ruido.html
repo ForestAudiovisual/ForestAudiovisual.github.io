@@ -41,6 +41,11 @@ main{position:relative;z-index:5;height:100%;display:flex;align-items:center;jus
 .inicio{right:env(safe-area-inset-right,0px);font-size:14px}
 .pie:hover,.inicio:hover{opacity:.5}
 .pie:focus-visible,.inicio:focus-visible{outline:1px solid var(--dim);outline-offset:2px}
+.esq{position:fixed;z-index:6;padding:20px 22px;font-family:"Courier New",Courier,monospace;font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.6);text-decoration:none;transition:opacity .3s}
+.esq:hover{opacity:.5}
+.esq:focus-visible{outline:1px solid var(--dim);outline-offset:2px}
+.tl{left:env(safe-area-inset-left,0px);top:env(safe-area-inset-top,0px)}
+.tr{right:env(safe-area-inset-right,0px);top:env(safe-area-inset-top,0px)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -53,6 +58,8 @@ main{position:relative;z-index:5;height:100%;display:flex;align-items:center;jus
 </svg>
 </main>
 <div id="hint">Deslizá el dedo</div>
+<a class="esq tl" href="https://forestaudiovisual.github.io/triangulo.html">Triángulo</a>
+<a class="esq tr" href="https://forestaudiovisual.github.io/puchi.html">Puchi</a>
 <a class="pie" href="https://forestaudiovisual.github.io/pentagono.html">Pentágono</a>
 <a class="inicio" href="https://forestaudiovisual.github.io/" aria-label="Volver al inicio">volver</a>
 <script>
