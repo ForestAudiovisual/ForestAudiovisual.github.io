@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Triángulo</title>
+<style>
+:root{--bg:#000;--fg:#fff;--dim:rgba(255,255,255,.28);box-sizing:border-box;color-scheme:dark}
+html{height:100%}
+*{box-sizing:border-box}
+body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:300 15px/1.4 "Courier New",Courier,monospace;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+
+/* FONDO GLITCH MONOCROMÁTICO */
+.glitch-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:repeating-linear-gradient(0deg,transparent 0px,transparent 3px,rgba(255,255,255,.035) 4px)}
+.glitch-bg::before{content:"";position:absolute;inset:-50%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");opacity:.10;animation:ruido .2s steps(2) infinite}
+.glitch-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(255,255,255,.12) 45.2%,transparent 45.8%),linear-gradient(90deg,transparent 20%,rgba(255,255,255,.08) 20.2%,transparent 20.5%);animation:interferencia 7s infinite steps(1)}
+@keyframes ruido{0%{transform:translate(0,0)}25%{transform:translate(2%,-1%)}50%{transform:translate(-1%,2%)}75%{transform:translate(1%,1%)}100%{transform:translate(-2%,-1%)}}
+@keyframes interferencia{0%,85%,100%{opacity:0;transform:translateX(0)}86%{opacity:1;transform:translateX(15px)}87%{opacity:0}91%{opacity:.8;transform:translateX(-20px)}92%{opacity:0}}
+.bloques{position:fixed;inset:0;pointer-events:none;z-index:1}
+.bloques span{position:absolute;background:#fff;opacity:0;animation:bloquesGlitch 8s infinite steps(1)}
+.bloques span:nth-child(1){top:22%;left:10%;width:120px;height:2px}
+.bloques span:nth-child(2){top:67%;right:15%;width:80px;height:5px;animation-delay:2s}
+.bloques span:nth-child(3){top:40%;right:8%;width:3px;height:60px;animation-delay:4s}
+.bloques span:nth-child(4){bottom:20%;left:25%;width:160px;height:3px;animation-delay:5s}
+@keyframes bloquesGlitch{0%,89%,100%{opacity:0}90%{opacity:.8;transform:translateX(12px)}91%{opacity:0}93%{opacity:.5;transform:translateX(-8px)}94%{opacity:0}}
+
+#c{position:fixed;inset:0;z-index:5;display:block}
+
+/* FADER LATERAL */
+#fader{position:fixed;z-index:6;right:calc(14px + env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);width:44px;height:min(52vh,320px);touch-action:none;cursor:ns-resize;outline:none}
+#fader:focus-visible{outline:1px solid var(--dim);outline-offset:6px}
+.fline{position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--dim)}
+#ffill{position:absolute;bottom:0;left:50%;width:1px;background:#fff}
+#fthumb{position:absolute;left:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:#fff;transition:transform .15s}
+#fader.on #fthumb{transform:scale(1.35)}
+
+#hint{position:fixed;z-index:6;left:0;right:0;bottom:calc(28px + env(safe-area-inset-bottom,0px));text-align:center;color:rgba(255,255,255,.5);letter-spacing:1px;font-size:12px;transition:opacity .6s;pointer-events:none}
+#hint.hide{opacity:0}
+.inicio{position:fixed;z-index:6;right:env(safe-area-inset-right,0px);bottom:env(safe-area-inset-bottom,0px);padding:20px 22px;color:rgba(255,255,255,.6);text-decoration:none;font-size:14px;letter-spacing:1px;transition:opacity .3s}
+.inicio:hover{opacity:.5}
+.inicio:focus-visible{outline:1px solid var(--dim);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.glitch-bg::before,.glitch-bg::after,.bloques span{animation:none!important}*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="glitch-bg" aria-hidden="true"></div>
+<div class="bloques" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+<canvas id="c" aria-label="Un triángulo blanco que se rompe en partículas"></canvas>
+<div id="fader" role="slider" tabindex="0" aria-orientation="vertical" aria-label="Romper el triángulo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="fline"></div><div id="ffill"></div><div id="fthumb"></div></div>
+<a class="inicio" href="https://forestaudiovisual.github.io/" aria-label="Volver al inicio">volver</a>
+<div id="hint">deslizá el fader</div>
+
+<script>
+const $=id=>document.getElementById(id),cv=$('c'),g=cv.getContext('2d'),fader=$('fader'),fthumb=$('fthumb'),ffill=$('ffill'),hint=$('hint');
+let W,H,dpr,cx,cy,S,HH,D,floorY,v=0,P=[],last=0,budget=3;
+
+/* TRIÁNGULO HECHO DE PARTÍCULAS */
+function build(){
+  P=[];const top=-2*HH/3;
+  for(let y=0;y<=HH;y+=D){
+    const w=y/HH*S;
+    for(let x=-w/2;x<=w/2+.01;x+=D){
+      const hx=cx+x,hy=cy+top+y,dn=Math.min(1,Math.hypot(x,top+y)/(2*HH/3));
+      P.push({hx,hy,x:hx,y:hy,vx:0,vy:0,free:false,
+        th:.03+.97*(.6*Math.random()+.4*(1-dn)), // las puntas se rompen primero
+        sz:.45+Math.random()*.7,al:.55+Math.random()*.45,off:Math.random()*6});
+    }
+  }
+}
+function resize(){
+  dpr=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;
+  cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';g.setTransform(dpr,0,0,dpr,0,0);
+  const aw=W-64;cx=aw/2+4;S=Math.min(aw*.62,H*.55);HH=S*.866;D=Math.max(3.5,S/52);
+  cy=H/2+HH/6;floorY=H-58;build();
+}
+resize();addEventListener('resize',resize);
+
+/* AUDIO: piedritas */
+let ctx,master,nbuf,voices=0;
+function init(){
+  if(ctx){if(ctx.state!=='running')ctx.resume();return}
+  ctx=new (window.AudioContext||window.webkitAudioContext)();const sr=ctx.sampleRate;
+  nbuf=ctx.createBuffer(1,sr,sr);const nd=nbuf.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
+  const lim=ctx.createDynamicsCompressor();lim.threshold.value=-12;lim.knee.value=0;lim.ratio.value=20;lim.attack.value=.003;lim.release.value=.15;lim.connect(ctx.destination);
+  master=ctx.createGain();master.gain.value=.9;master.connect(lim);
+  const dly=ctx.createDelay(1);dly.delayTime.value=.11;const fb=ctx.createGain();fb.gain.value=.28;
+  const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2500;const wet=ctx.createGain();wet.gain.value=.18;
+  master.connect(dly);dly.connect(lp);lp.connect(fb);fb.connect(dly);lp.connect(wet);wet.connect(lim);
+}
+function click(t,amp,f,q,dur){
+  const n=ctx.createBufferSource();n.buffer=nbuf;
+  const b=ctx.createBiquadFilter();b.type='bandpass';b.frequency.value=f;b.Q.value=q;
+  const e=ctx.createGain();e.gain.setValueAtTime(0,t);e.gain.linearRampToValueAtTime(amp*3,t+.001);e.gain.exponentialRampToValueAtTime(.0005,t+dur);
+  n.connect(b);b.connect(e);e.connect(master);n.start(t,Math.random()*.9);n.stop(t+dur+.02);
+  voices++;n.onended=()=>voices--;
+}
+function snd(a){ // a: intensidad 0..1
+  if(!ctx||ctx.state!=='running'||budget<=0||voices>36)return;budget--;
+  const t=ctx.currentTime;
+  click(t,.3+.6*a,900+Math.random()*3800,5+Math.random()*10,.03+.05*a*Math.random());
+  if(Math.random()<.7){ // golpecito grave de la piedra
+    const o=ctx.createOscillator(),e=ctx.createGain();o.type='triangle';
+    o.frequency.setValueAtTime(260+Math.random()*700,t);o.frequency.exponentialRampToValueAtTime(110+Math.random()*80,t+.04);
+    e.gain.setValueAtTime(0,t);e.gain.linearRampToValueAtTime(.05+.18*a,t+.002);e.gain.exponentialRampToValueAtTime(.0005,t+.05);
+    o.connect(e);e.connect(master);o.start(t);o.stop(t+.06);
+  }
+  if(Math.random()<.5)click(t+.02+Math.random()*.04,.2+.3*a,800+Math.random()*3000,6+Math.random()*8,.02); // rebotecito
+}
+
+/* FÍSICA */
+function update(dt){
+  const G=H*1.5;
+  for(let i=0;i<P.length;i++){
+    const p=P[i];
+    if(v>=p.th){
+      if(!p.free){
+        p.free=true;const a=Math.atan2(p.hy-cy,p.hx-cx),sp=30+Math.random()*110;
+        p.vx=Math.cos(a)*sp+(Math.random()-.5)*60;p.vy=Math.sin(a)*sp-Math.random()*90;snd(.3);
+      }
+      p.vy+=G*dt;p.vx*=1-.5*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;
+      const fy=floorY-p.off;
+      if(p.y>fy){
+        p.y=fy;
+        if(p.vy>130){snd(Math.min(1,p.vy/700));p.vy=-p.vy*(.25+Math.random()*.2)}else p.vy=0;
+        p.vx*=.6;
+      }
+      if(p.vy===0&&p.y>=fy)p.vx*=Math.max(0,1-8*dt);
+      if(p.x<6){p.x=6;p.vx=Math.abs(p.vx)*.4}else if(p.x>W-70){p.x=W-70;p.vx=-Math.abs(p.vx)*.4}
+    }else if(p.free||p.x!==p.hx||p.y!==p.hy){ // vuelve a su lugar
+      const k=Math.min(1,dt*7);p.x+=(p.hx-p.x)*k;p.y+=(p.hy-p.y)*k;p.vx=p.vy=0;p.free=false;
+      if(Math.abs(p.hx-p.x)<.2&&Math.abs(p.hy-p.y)<.2){p.x=p.hx;p.y=p.hy}
+    }
+  }
+}
+function draw(){
+  g.clearRect(0,0,W,H);g.fillStyle='#fff';
+  for(let i=0;i<P.length;i++){
+    const p=P[i];
+    if(p.free){const z=D*p.sz;g.globalAlpha=p.al;g.fillRect(p.x-z/2,p.y-z/2,z,z)}
+    else{
+      let ox=0,oy=0;
+      if(v>0&&p.th-v<.05&&p.x===p.hx){ox=(Math.random()-.5)*2.4;oy=(Math.random()-.5)*2.4} // a punto de romperse
+      g.globalAlpha=1;g.fillRect(p.x+ox-D/2-.3,p.y+oy-D/2-.3,D+.6,D+.6);
+    }
+  }
+  g.globalAlpha=1;
+}
+function loop(ts){
+  const dt=Math.min(.033,last?(ts-last)/1000:.016);last=ts;budget=3;
+  update(dt);draw();requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* FADER */
+function showV(){fthumb.style.top=((1-v)*100)+'%';ffill.style.height=(v*100)+'%';fader.setAttribute('aria-valuenow',Math.round(v*100))}
+function setV(n){const o=v;v=Math.max(0,Math.min(1,n));showV();if(v>o&&v<1&&Math.random()<.7)snd(.2+Math.random()*.3)}
+function fromY(y){const r=fader.getBoundingClientRect();setV(1-(y-r.top)/r.height)}
+fader.addEventListener('pointerdown',e=>{e.preventDefault();fader.setPointerCapture(e.pointerId);fader.classList.add('on');fromY(e.clientY)});
+fader.addEventListener('pointermove',e=>{if(fader.classList.contains('on'))fromY(e.clientY)});
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>fader.addEventListener(t,()=>fader.classList.remove('on')));
+fader.addEventListener('keydown',e=>{
+  const d={ArrowUp:.05,ArrowRight:.05,ArrowDown:-.05,ArrowLeft:-.05}[e.key];if(!d)return;
+  e.preventDefault();setV(v+d);
+});
+showV();
+
+/* ACTIVAR SONIDO CON EL PRIMER TOQUE */
+function unlock(){init();hint.classList.add('hide')}
+document.addEventListener('pointerdown',unlock);
+document.addEventListener('keydown',unlock);
+</script>
+</body>
+</html>
