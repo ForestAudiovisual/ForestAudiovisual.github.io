@@ -36,9 +36,12 @@ body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:300 15px/1.4
 
 #hint{position:fixed;z-index:6;left:0;right:0;bottom:calc(28px + env(safe-area-inset-bottom,0px));text-align:center;color:rgba(255,255,255,.5);letter-spacing:1px;font-size:12px;transition:opacity .6s;pointer-events:none}
 #hint.hide{opacity:0}
-.inicio{position:fixed;z-index:6;right:env(safe-area-inset-right,0px);bottom:env(safe-area-inset-bottom,0px);padding:20px 22px;color:rgba(255,255,255,.6);text-decoration:none;font-size:14px;letter-spacing:1px;transition:opacity .3s}
-.inicio:hover{opacity:.5}
-.inicio:focus-visible{outline:1px solid var(--dim);outline-offset:2px}
+.inicio,.circ{position:fixed;z-index:6;bottom:env(safe-area-inset-bottom,0px);padding:20px 22px;color:rgba(255,255,255,.6);text-decoration:none;letter-spacing:1px;transition:opacity .3s}
+.inicio{right:env(safe-area-inset-right,0px);font-size:14px}
+.circ{left:env(safe-area-inset-left,0px);font-size:11px}
+.inicio:hover,.circ:hover{opacity:.5}
+.inicio:focus-visible,.circ:focus-visible{outline:1px solid var(--dim);outline-offset:2px}
+@media(max-width:520px){#hint{bottom:calc(68px + env(safe-area-inset-bottom,0px))}}
 @media (prefers-reduced-motion:reduce){.glitch-bg::before,.glitch-bg::after,.bloques span{animation:none!important}*{transition:none!important}}
 </style>
 </head>
@@ -49,6 +52,7 @@ body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:300 15px/1.4
 <canvas id="c" aria-label="Una bolita rebotando dentro de un pentágono"></canvas>
 <div id="fader" role="slider" tabindex="0" aria-orientation="vertical" aria-label="Tamaño del pentágono" aria-valuemin="0" aria-valuemax="100" aria-valuenow="70"><div class="fline"></div><div id="ffill"></div><div id="fthumb"></div></div>
 <a class="inicio" href="https://forestaudiovisual.github.io/" aria-label="Volver al inicio">volver</a>
+<a class="circ" href="https://forestaudiovisual.github.io/circulo_de_ruido.html">Círculo de Ruido</a>
 <div id="hint">tocá para activar el sonido</div>
 
 <script>
@@ -177,4 +181,3 @@ document.addEventListener('keydown',unlock);
 </script>
 </body>
 </html>
-
