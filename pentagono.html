@@ -41,6 +41,11 @@ body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:300 15px/1.4
 .circ{left:env(safe-area-inset-left,0px);font-size:11px}
 .inicio:hover,.circ:hover{opacity:.5}
 .inicio:focus-visible,.circ:focus-visible{outline:1px solid var(--dim);outline-offset:2px}
+.esq{position:fixed;z-index:6;padding:20px 22px;color:rgba(255,255,255,.6);text-decoration:none;font-size:11px;letter-spacing:1px;transition:opacity .3s}
+.esq:hover{opacity:.5}
+.esq:focus-visible{outline:1px solid var(--dim);outline-offset:2px}
+.tl{left:env(safe-area-inset-left,0px);top:env(safe-area-inset-top,0px)}
+.tr{right:env(safe-area-inset-right,0px);top:env(safe-area-inset-top,0px)}
 @media(max-width:520px){#hint{bottom:calc(68px + env(safe-area-inset-bottom,0px))}}
 @media (prefers-reduced-motion:reduce){.glitch-bg::before,.glitch-bg::after,.bloques span{animation:none!important}*{transition:none!important}}
 </style>
@@ -53,6 +58,8 @@ body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:300 15px/1.4
 <div id="fader" role="slider" tabindex="0" aria-orientation="vertical" aria-label="Tamaño del pentágono" aria-valuemin="0" aria-valuemax="100" aria-valuenow="70"><div class="fline"></div><div id="ffill"></div><div id="fthumb"></div></div>
 <a class="inicio" href="https://forestaudiovisual.github.io/" aria-label="Volver al inicio">volver</a>
 <a class="circ" href="https://forestaudiovisual.github.io/circulo_de_ruido.html">Círculo de Ruido</a>
+<a class="esq tl" href="https://forestaudiovisual.github.io/triangulo.html">Triángulo</a>
+<a class="esq tr" href="https://forestaudiovisual.github.io/puchi.html">Puchi</a>
 <div id="hint">tocá para activar el sonido</div>
 
 <script>
