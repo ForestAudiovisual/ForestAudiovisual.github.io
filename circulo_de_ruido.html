@@ -9,7 +9,21 @@
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 *{box-sizing:border-box}
 body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:300 15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
-main{height:100%;display:flex;align-items:center;justify-content:center;padding:0 5%}
+/* FONDO GLITCH MONOCROMÁTICO */
+.glitch-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:repeating-linear-gradient(0deg,transparent 0px,transparent 3px,rgba(255,255,255,.035) 4px)}
+.glitch-bg::before{content:"";position:absolute;inset:-50%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");opacity:.10;animation:ruido .2s steps(2) infinite}
+.glitch-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(255,255,255,.12) 45.2%,transparent 45.8%),linear-gradient(90deg,transparent 20%,rgba(255,255,255,.08) 20.2%,transparent 20.5%);animation:interferencia 7s infinite steps(1)}
+@keyframes ruido{0%{transform:translate(0,0)}25%{transform:translate(2%,-1%)}50%{transform:translate(-1%,2%)}75%{transform:translate(1%,1%)}100%{transform:translate(-2%,-1%)}}
+@keyframes interferencia{0%,85%,100%{opacity:0;transform:translateX(0)}86%{opacity:1;transform:translateX(15px)}87%{opacity:0}91%{opacity:.8;transform:translateX(-20px)}92%{opacity:0}}
+.bloques{position:fixed;inset:0;pointer-events:none;z-index:1}
+.bloques span{position:absolute;background:#fff;opacity:0;animation:bloquesGlitch 8s infinite steps(1)}
+.bloques span:nth-child(1){top:22%;left:10%;width:120px;height:2px}
+.bloques span:nth-child(2){top:67%;right:15%;width:80px;height:5px;animation-delay:2s}
+.bloques span:nth-child(3){top:40%;right:8%;width:3px;height:60px;animation-delay:4s}
+.bloques span:nth-child(4){bottom:20%;left:25%;width:160px;height:3px;animation-delay:5s}
+@keyframes bloquesGlitch{0%,89%,100%{opacity:0}90%{opacity:.8;transform:translateX(12px)}91%{opacity:0}93%{opacity:.5;transform:translateX(-8px)}94%{opacity:0}}
+
+main{position:relative;z-index:5;height:100%;display:flex;align-items:center;justify-content:center;padding:0 5%}
 #pad{width:min(88vw,64vh,560px);height:auto;aspect-ratio:1;touch-action:none;cursor:crosshair;outline:none;display:block}
 #pad:focus-visible{outline:1px solid var(--dim);outline-offset:8px;border-radius:50%}
 .rg{fill:none;stroke:var(--dim);stroke-width:.4}
@@ -20,17 +34,19 @@ main{height:100%;display:flex;align-items:center;justify-content:center;padding:
 #dotg{transition:transform .07s}
 #dot{fill:#fff;transition:transform .15s}
 #pad.on #dot{transform:scale(1.4)}
-#hint{position:fixed;left:0;right:0;bottom:calc(28px + env(safe-area-inset-bottom,0px));text-align:center;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;font-size:12px;transition:opacity .6s}
+#hint{position:fixed;z-index:6;left:0;right:0;bottom:calc(28px + env(safe-area-inset-bottom,0px));text-align:center;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;font-size:12px;transition:opacity .6s}
 #hint.hide{opacity:0}
-.pie,.inicio{position:fixed;bottom:env(safe-area-inset-bottom,0px);padding:20px 22px;font-family:"Courier New",Courier,monospace;letter-spacing:1px;color:rgba(255,255,255,.6);text-decoration:none;transition:opacity .3s}
+.pie,.inicio{position:fixed;z-index:6;bottom:env(safe-area-inset-bottom,0px);padding:20px 22px;font-family:"Courier New",Courier,monospace;letter-spacing:1px;color:rgba(255,255,255,.6);text-decoration:none;transition:opacity .3s}
 .pie{left:env(safe-area-inset-left,0px);font-size:11px}
 .inicio{right:env(safe-area-inset-right,0px);font-size:14px}
 .pie:hover,.inicio:hover{opacity:.5}
 .pie:focus-visible,.inicio:focus-visible{outline:1px solid var(--dim);outline-offset:2px}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<div class="glitch-bg" aria-hidden="true"></div>
+<div class="bloques" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
 <main>
 <svg id="pad" viewBox="0 0 200 200" tabindex="0" role="application" aria-label="Círculo de notas">
 <g id="st"></g><path id="cell" d=""/><g id="dotg"><circle id="dot" r="4.5" cx="0" cy="0"/></g>
