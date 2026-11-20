@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Traka</title>
+<style>
+:root{--bg:#000;--fg:#fff;--dim:rgba(255,255,255,.28);box-sizing:border-box;color-scheme:dark}
+html{height:100%}
+*{box-sizing:border-box}
+body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:300 15px/1.4 "Courier New",Courier,monospace;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+
+/* FONDO GLITCH MONOCROMÁTICO */
+.glitch-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:repeating-linear-gradient(0deg,transparent 0px,transparent 3px,rgba(255,255,255,.035) 4px)}
+.glitch-bg::before{content:"";position:absolute;inset:-50%;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");opacity:.10;animation:ruido .2s steps(2) infinite}
+.glitch-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(255,255,255,.12) 45.2%,transparent 45.8%),linear-gradient(90deg,transparent 20%,rgba(255,255,255,.08) 20.2%,transparent 20.5%);animation:interferencia 7s infinite steps(1)}
+@keyframes ruido{0%{transform:translate(0,0)}25%{transform:translate(2%,-1%)}50%{transform:translate(-1%,2%)}75%{transform:translate(1%,1%)}100%{transform:translate(-2%,-1%)}}
+@keyframes interferencia{0%,85%,100%{opacity:0;transform:translateX(0)}86%{opacity:1;transform:translateX(15px)}87%{opacity:0}91%{opacity:.8;transform:translateX(-20px)}92%{opacity:0}}
+.bloques{position:fixed;inset:0;pointer-events:none;z-index:1}
+.bloques span{position:absolute;background:#fff;opacity:0;animation:bloquesGlitch 8s infinite steps(1)}
+.bloques span:nth-child(1){top:22%;left:10%;width:120px;height:2px}
+.bloques span:nth-child(2){top:67%;right:15%;width:80px;height:5px;animation-delay:2s}
+.bloques span:nth-child(3){top:40%;right:8%;width:3px;height:60px;animation-delay:4s}
+.bloques span:nth-child(4){bottom:20%;left:25%;width:160px;height:3px;animation-delay:5s}
+@keyframes bloquesGlitch{0%,89%,100%{opacity:0}90%{opacity:.8;transform:translateX(12px)}91%{opacity:0}93%{opacity:.5;transform:translateX(-8px)}94%{opacity:0}}
+
+#c{position:fixed;inset:0;z-index:5;display:block}
+
+/* FADER LATERAL */
+#fader{position:fixed;z-index:6;right:calc(14px + env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);width:44px;height:min(52vh,320px);touch-action:none;cursor:ns-resize;outline:none}
+#fader:focus-visible{outline:1px solid var(--dim);outline-offset:6px}
+.fline{position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--dim)}
+#ffill{position:absolute;bottom:0;left:50%;width:1px;background:#fff}
+#fthumb{position:absolute;left:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:#fff;transition:transform .15s}
+#fader.on #fthumb{transform:scale(1.35)}
+
+#bpm{position:fixed;z-index:6;left:0;right:0;top:calc(26px + env(safe-area-inset-top,0px));text-align:center;color:rgba(255,255,255,.6);letter-spacing:1px;font-size:13px;pointer-events:none}
+#hint{position:fixed;z-index:6;left:0;right:0;bottom:calc(28px + env(safe-area-inset-bottom,0px));text-align:center;color:rgba(255,255,255,.5);letter-spacing:1px;font-size:12px;transition:opacity .6s;pointer-events:none}
+#hint.hide{opacity:0}
+.inicio{position:fixed;z-index:6;right:env(safe-area-inset-right,0px);bottom:env(safe-area-inset-bottom,0px);padding:20px 22px;color:rgba(255,255,255,.6);text-decoration:none;font-size:14px;letter-spacing:1px;transition:opacity .3s}
+.inicio:hover{opacity:.5}
+.inicio:focus-visible{outline:1px solid var(--dim);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.glitch-bg::before,.glitch-bg::after,.bloques span{animation:none!important}*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="glitch-bg" aria-hidden="true"></div>
+<div class="bloques" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+<canvas id="c" aria-label="Un traka traka blanco que se acelera"></canvas>
+<div id="bpm" aria-live="off">20 bpm</div>
+<div id="fader" role="slider" tabindex="0" aria-orientation="vertical" aria-label="Velocidad" aria-valuemin="20" aria-valuemax="300" aria-valuenow="20" aria-valuetext="20 bpm"><div class="fline"></div><div id="ffill"></div><div id="fthumb"></div></div>
+<a class="inicio" href="https://forestaudiovisual.github.io/" aria-label="Volver al inicio">volver</a>
+<div id="hint">tocá para activar el sonido</div>
+
+<script>
+const $=id=>document.getElementById(id),cv=$('c'),g=cv.getContext('2d'),fader=$('fader'),fthumb=$('fthumb'),ffill=$('ffill'),hint=$('hint'),bpmEl=$('bpm');
+const MIN=20,MAX=300;
+let W,H,dpr,cx,cy,v=0,bpm=MIN,last=0;
+const bars=[0,0,0,0];            // intensidad visual de cada golpe: tra ka tra ka
+const AMP=[1,.6,.8,.7];           // acentos del patrón
+
+function resize(){
+  dpr=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;
+  cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';g.setTransform(dpr,0,0,dpr,0,0);
+  cx=(W-64)/2+4;cy=H/2;
+}
+resize();addEventListener('resize',resize);
+
+/* AUDIO */
+let ctx,master,nbuf,lim;
+const now=()=>ctx?ctx.currentTime:performance.now()/1000;
+function init(){
+  if(ctx){if(ctx.state!=='running')ctx.resume();return}
+  ctx=new (window.AudioContext||window.webkitAudioContext)();const sr=ctx.sampleRate;
+  nbuf=ctx.createBuffer(1,sr,sr);const nd=nbuf.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
+  lim=ctx.createDynamicsCompressor();lim.threshold.value=-12;lim.knee.value=0;lim.ratio.value=20;lim.attack.value=.003;lim.release.value=.15;lim.connect(ctx.destination);
+  master=ctx.createGain();master.gain.value=.9;master.connect(lim);
+  const dly=ctx.createDelay(1);dly.delayTime.value=.09;const fb=ctx.createGain();fb.gain.value=.25;
+  const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=3000;const wet=ctx.createGain();wet.gain.value=.14;
+  master.connect(dly);dly.connect(lp);lp.connect(fb);fb.connect(dly);lp.connect(wet);wet.connect(lim);
+  q.length=0;nextT=now()+.05; // el reloj cambia al del audio
+}
+function click(t,amp,f,q,dur){
+  const n=ctx.createBufferSource();n.buffer=nbuf;
+  const b=ctx.createBiquadFilter();b.type='bandpass';b.frequency.value=f;b.Q.value=q;
+  const e=ctx.createGain();e.gain.setValueAtTime(0,t);e.gain.linearRampToValueAtTime(amp*3,t+.001);e.gain.exponentialRampToValueAtTime(.0005,t+dur);
+  n.connect(b);b.connect(e);e.connect(master);n.start(t,Math.random()*.9);n.stop(t+dur+.02);
+}
+function tone(t,amp,f0,f1,dur){
+  const o=ctx.createOscillator(),e=ctx.createGain();o.type='triangle';
+  o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur*.8);
+  e.gain.setValueAtTime(0,t);e.gain.linearRampToValueAtTime(amp,t+.002);e.gain.exponentialRampToValueAtTime(.0005,t+dur);
+  o.connect(e);e.connect(master);o.start(t);o.stop(t+dur+.01);
+}
+function kick(t,a){ // bombo seco: barrido grave corto + chasquido, sin cola
+  const o=ctx.createOscillator(),e=ctx.createGain();o.type='sine';
+  o.frequency.setValueAtTime(190,t);o.frequency.exponentialRampToValueAtTime(48,t+.09);
+  e.gain.setValueAtTime(0,t);e.gain.linearRampToValueAtTime(.9*a,t+.002);e.gain.exponentialRampToValueAtTime(.0008,t+.15);
+  o.connect(e);e.connect(lim);o.start(t);o.stop(t+.17);
+  click(t,.35*a,2200,2,.012);
+}
+function hat(t,a,dur){ // hat cerrado: ruido agudo muy corto
+  const n=ctx.createBufferSource();n.buffer=nbuf;
+  const h=ctx.createBiquadFilter();h.type='highpass';h.frequency.value=7200+Math.random()*1200;
+  const e=ctx.createGain();e.gain.setValueAtTime(0,t);e.gain.linearRampToValueAtTime(a,t+.001);e.gain.exponentialRampToValueAtTime(.0005,t+dur);
+  n.connect(h);h.connect(e);e.connect(master);n.start(t,Math.random()*.9);n.stop(t+dur+.02);
+}
+function chime(t,a,f){ // campanita cortita
+  for(const [m,k] of [[1,1],[2.76,.35]]){
+    const o=ctx.createOscillator(),e=ctx.createGain();o.type='sine';o.frequency.value=f*m;
+    e.gain.setValueAtTime(0,t);e.gain.linearRampToValueAtTime(a*k,t+.002);e.gain.exponentialRampToValueAtTime(.0005,t+.11);
+    o.connect(e);e.connect(master);o.start(t);o.stop(t+.12);
+  }
+}
+function voice(t,step){
+  const a=AMP[step],r=.97+Math.random()*.06;
+  if(step%2===0)kick(t,a);                 // rectángulos altos = kick seco
+  else{                                     // cuadraditos = hat corto + chime agudo
+    hat(t,.55*a,.03);
+    chime(t,.09*a,(step===1?2093:2637)*r);  // Do7 / Mi7
+  }
+}
+
+/* SECUENCIADOR: 8 pulsos por compás = "tra-ka tra-ka" */
+let nextT=now()+.05,step=0;const q=[];
+function sched(){
+  const n=now();
+  if(nextT<n-.1)nextT=n+.03; // si la pestaña estuvo dormida, no dispara todo junto
+  while(nextT<n+.12){
+    q.push({t:nextT,s:step});
+    if(ctx&&ctx.state==='running')voice(nextT,step);
+    step=(step+1)%4;nextT+=30/bpm; // cada "tra" o "ka" es una corchea
+  }
+}
+setInterval(sched,25);
+
+/* DIBUJO */
+function draw(dt){
+  const n=now();
+  while(q.length&&q[0].t<=n){bars[q.shift().s]=1}
+  g.clearRect(0,0,W,H);
+  const aw=W-64,total=Math.min(aw*.8,520),gap=total*.04,bw=(total-gap*3)/4,hT=Math.min(H*.36,260);
+  const x0=cx-total/2;
+  for(let i=0;i<4;i++){
+    const tall=i%2===0,w=tall?bw:bw*.5,h=tall?hT:bw*.5,x=x0+i*(bw+gap)+(bw-w)/2,y=cy-h/2,k=bars[i];
+    const jx=(Math.random()-.5)*6*k;
+    g.fillStyle='rgba(255,255,255,'+(.08+.92*k).toFixed(3)+')';g.fillRect(x+jx,y,w,h);
+    g.strokeStyle='rgba(255,255,255,'+(.28+.5*k).toFixed(3)+')';g.lineWidth=1;g.strokeRect(x+jx+.5,y+.5,w-1,h-1);
+    bars[i]=Math.max(0,k*Math.exp(-dt*11));
+  }
+}
+function loop(ts){
+  const dt=Math.min(.05,last?(ts-last)/1000:.016);last=ts;
+  draw(dt);requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* FADER: 20 → 300 bpm (progresión exponencial, se siente más pareja) */
+function showV(){
+  bpm=MIN*Math.pow(MAX/MIN,v);const r=Math.round(bpm);
+  fthumb.style.top=((1-v)*100)+'%';ffill.style.height=(v*100)+'%';
+  bpmEl.textContent=r+' bpm';fader.setAttribute('aria-valuenow',r);fader.setAttribute('aria-valuetext',r+' bpm');
+}
+function fromY(y){const r=fader.getBoundingClientRect();v=Math.max(0,Math.min(1,1-(y-r.top)/r.height));showV()}
+fader.addEventListener('pointerdown',e=>{e.preventDefault();fader.setPointerCapture(e.pointerId);fader.classList.add('on');fromY(e.clientY)});
+fader.addEventListener('pointermove',e=>{if(fader.classList.contains('on'))fromY(e.clientY)});
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>fader.addEventListener(t,()=>fader.classList.remove('on')));
+fader.addEventListener('keydown',e=>{
+  const d={ArrowUp:.03,ArrowRight:.03,ArrowDown:-.03,ArrowLeft:-.03}[e.key];if(!d)return;
+  e.preventDefault();v=Math.max(0,Math.min(1,v+d));showV();
+});
+showV();
+
+/* ACTIVAR SONIDO CON EL PRIMER TOQUE */
+function unlock(){init();hint.classList.add('hide')}
+document.addEventListener('pointerdown',unlock);
+document.addEventListener('keydown',unlock);
+</script>
+</body>
+</html>
